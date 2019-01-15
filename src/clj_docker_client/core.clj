@@ -157,12 +157,14 @@
   Takes the image, entry point command, env vars and host->container port mapping.
 
   Returns the id of the created container."
-  [^DockerClient connection image cmd env-vars exposed-ports]
+  [^DockerClient connection image cmd env-vars exposed-ports name]
   (let [config   (u/config-of image
                               (u/sh-tokenize! cmd)
                               (f/format-env-vars env-vars)
                               exposed-ports)
-        creation ^ContainerCreation (.createContainer connection config)]
+        creation ^ContainerCreation (if name
+                                      (.createContainer connection config name)
+                                      (.createContainer connection config))]
     (u/format-id (.id creation))))
 
 (defn ps
